@@ -20,8 +20,11 @@ const Scoreboard: React.FC = () => {
     const [selectedTournament, setSelectedTournament] = useState<number | null>(null);
     const [players, setPlayers] = useState<Player[]>([]);
     const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
-    const [scores, setScores] = useState<{ [key: string]: number }>({});
+    const [gameScores, setGameScores] = useState<{ [game: number]: { [key: string]: number } }>({});
+    const [currentGame, setCurrentGame] = useState<number>(1);
     const [servingPlayer, setServingPlayer] = useState<string | null>(null);
+    const [gameWinners, setGameWinners] = useState<string[]>([]);
+    const [matchWinner, setMatchWinner] = useState<string | null>(null);
 
     useEffect(() => {
         // Fetch tournaments
@@ -54,9 +57,22 @@ const Scoreboard: React.FC = () => {
     }, [selectedTournament]);
 
     const handleScoreChange = (player: string, increment: boolean) => {
-        setScores((prevScores) => {
-            const newScore = prevScores[player] + (increment ? 1 : -1);
-            return { ...prevScores, [player]: Math.max(newScore, 0) };
+        setGameScores((prevGameScores) => {
+            const currentGameScores = prevGameScores[currentGame] ?? {};
+            const currentScore = currentGameScores[player] ?? 0;
+            const newScore = increment ? currentScore + 1 : currentScore - 1;
+            const updatedGameScores = {
+                ...prevGameScores,
+                [currentGame]: {
+                    ...currentGameScores,
+                    [player]: Math.max(newScore, 0),
+                },
+            };
+
+            // Check for win conditions
+            checkForGameWinner(updatedGameScores);
+
+            return updatedGameScores;
         });
 
         // Set serving player to the player who scored
@@ -65,10 +81,49 @@ const Scoreboard: React.FC = () => {
         }
     };
 
+    const checkForGameWinner = (updatedGameScores: { [game: number]: { [key: string]: number } }) => {
+        const currentGameScores = updatedGameScores[currentGame] ?? {};
+        const player1Score = currentGameScores[selectedPlayers[0]] ?? 0;
+        const player2Score = currentGameScores[selectedPlayers[1]] ?? 0;
+
+        if (player1Score >= 21 && player1Score >= player2Score + 2) {
+            handleGameWin(selectedPlayers[0]);
+        } else if (player2Score >= 21 && player2Score >= player1Score + 2) {
+            handleGameWin(selectedPlayers[1]);
+        } else if (player1Score === 30 || player2Score === 30) {
+            handleGameWin(player1Score === 30 ? selectedPlayers[0] : selectedPlayers[1]);
+        }
+    };
+
+    const handleGameWin = (winner: string) => {
+        setGameWinners((prevWinners) => {
+            const newWinners = [...prevWinners, winner];
+            const winnerCounts = {
+                [selectedPlayers[0]]: newWinners.filter((w) => w === selectedPlayers[0]).length,
+                [selectedPlayers[1]]: newWinners.filter((w) => w === selectedPlayers[1]).length,
+            };
+
+            if (winnerCounts[winner] === 2) {
+                setMatchWinner(winner);
+                alert(`${players.find((p) => p.bsa_bwf_number === winner)?.name} wins the match!`);
+            } else {
+                // Move to the next game if the winner hasn't won two games yet
+                setCurrentGame((prevGame) => prevGame + 1);
+                setServingPlayer(null); // Reset serving player for the next game
+            }
+            return newWinners;
+        });
+    };
+
     const handlePlayerSelect = (index: number, bsa_bwf_number: string) => {
         const newSelectedPlayers = [...selectedPlayers];
         newSelectedPlayers[index] = bsa_bwf_number;
         setSelectedPlayers(newSelectedPlayers);
+        setGameScores({}); // Reset game scores when players are selected
+        setCurrentGame(1); // Reset to the first game
+        setServingPlayer(null); // Reset serving player
+        setGameWinners([]); // Reset game winners
+        setMatchWinner(null); // Reset match winner
     };
 
     return (
@@ -127,17 +182,32 @@ const Scoreboard: React.FC = () => {
 
             {selectedPlayers.length > 0 && (
                 <div>
-                    <h3>Scores</h3>
-                    {selectedPlayers.map((player) => (
-                        <div key={player}>
-                            <p>
-                                {players.find((p) => p.bsa_bwf_number === player)?.name} {players.find((p) => p.bsa_bwf_number === player)?.surname} {servingPlayer === player ? '*' : ''}
-                                <button onClick={() => handleScoreChange(player, true)}>+</button>
-                                <span>{scores[player] ?? 0}</span>
-                                <button onClick={() => handleScoreChange(player, false)}>-</button>
-                            </p>
+                    {[1, 2, 3].map((game) => (
+                        <div key={game} style={{ color: currentGame === game ? 'black' : 'grey' }}>
+                            <h3>Game {game} Scores</h3>
+                            {selectedPlayers.map((player) => (
+                                <div key={player}>
+                                    <p>
+                                        {players.find((p) => p.bsa_bwf_number === player)?.name} {players.find((p) => p.bsa_bwf_number === player)?.surname} {servingPlayer === player ? '*' : ''}
+                                        <button onClick={() => handleScoreChange(player, true)} disabled={game !== currentGame || gameWinners.includes(player)}>+</button>
+                                        <span>{(gameScores[game]?.[player] ?? 0).toString()}</span>
+                                        <button onClick={() => handleScoreChange(player, false)} disabled={game !== currentGame || gameWinners.includes(player)}>-</button>
+                                    </p>
+                                </div>
+                            ))}
+                            {gameWinners[game - 1] && (
+                                <div>
+                                    <h3>Game {game} Winner: {players.find((p) => p.bsa_bwf_number === gameWinners[game - 1])?.name}</h3>
+                                </div>
+                            )}
                         </div>
                     ))}
+                </div>
+            )}
+
+            {matchWinner && (
+                <div>
+                    <h2>Match Winner: {players.find((p) => p.bsa_bwf_number === matchWinner)?.name}</h2>
                 </div>
             )}
         </div>
