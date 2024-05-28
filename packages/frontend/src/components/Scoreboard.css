@@ -18,8 +18,8 @@
 .display-scoreboard {
     background: linear-gradient(270deg, red, gold, blue);
     background-size: 600% 600%;
-    padding: 0.5px; /* Reduced padding */
-    border-radius: 1px;
+    padding: 3px; /* Reduced padding */
+    border-radius: 5px;
     max-width: 400px; /* Adjusted max-width to make it more compact */
     margin: 0 auto;
     animation: backgroundAnimation 10s ease infinite; /* Add animation */

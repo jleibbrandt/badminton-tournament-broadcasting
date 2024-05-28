@@ -1,12 +1,32 @@
 {
-  "name": "badminton-tournament-broadcasting",
+  "name": "your-app-name",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Your app description",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron .",
+    "build": "pnpm run build:backend && pnpm run build:frontend && electron-builder",
+    "build:backend": "cd packages/backend && pnpm install && pnpm run build && cd ../..",
+    "build:frontend": "cd packages/frontend && pnpm install && pnpm run build && cd ../.. && pnpm run copy:frontend",
+    "copy:frontend": "rm -rf dist && mkdir dist && cp -r packages/frontend/dist/* dist/"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "build": {
+    "productName": "Badminton Tournament Software",
+    "files": [
+      "dist/**/*",
+      "packages/backend/dist/**/*",
+      "main.js",
+      "preload.js"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "devDependencies": {
+    "electron": "^30.0.8",
+    "electron-builder": "^24.13.3"
+  }
 }
