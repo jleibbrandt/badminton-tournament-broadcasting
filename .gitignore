@@ -1,4 +1,4 @@
-*.js
+S
 !jest.config.js
 !.prettierrc.js
 *.d.ts
