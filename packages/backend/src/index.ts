@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import path from 'path';
 import routes from './routes';
 import { setupWebSocket } from './websocket';
 
@@ -13,6 +14,14 @@ app.use(cors());
 
 app.use(bodyParser.json());
 app.use('/api', routes);
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// The "catchall" handler: for any request that doesn't match an API route, send back index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+});
 
 setupWebSocket(server);
 

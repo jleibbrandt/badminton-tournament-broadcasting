@@ -15,6 +15,13 @@ interface Tournament {
     type: string;
 }
 
+interface Score {
+    match_id: number;
+    game_number: number;
+    player_bsa_bwf_number: string;
+    score: number;
+}
+
 const Scoreboard: React.FC = () => {
     const [tournaments, setTournaments] = useState<Tournament[]>([]);
     const [selectedTournament, setSelectedTournament] = useState<number | null>(null);
@@ -23,8 +30,9 @@ const Scoreboard: React.FC = () => {
     const [gameScores, setGameScores] = useState<{ [game: number]: { [key: string]: number } }>({});
     const [currentGame, setCurrentGame] = useState<number>(1);
     const [servingPlayer, setServingPlayer] = useState<string | null>(null);
-    const [gameWinners, setGameWinners] = useState<string[]>([]);
+    const [gameWinners, setGameWinners] = useState<{ [game: number]: string }>({});
     const [matchWinner, setMatchWinner] = useState<string | null>(null);
+    const [currentMatchId, setCurrentMatchId] = useState<number | null>(null);
 
     useEffect(() => {
         // Fetch tournaments
@@ -97,10 +105,10 @@ const Scoreboard: React.FC = () => {
 
     const handleGameWin = (winner: string) => {
         setGameWinners((prevWinners) => {
-            const newWinners = [...prevWinners, winner];
+            const newWinners = { ...prevWinners, [currentGame]: winner };
             const winnerCounts = {
-                [selectedPlayers[0]]: newWinners.filter((w) => w === selectedPlayers[0]).length,
-                [selectedPlayers[1]]: newWinners.filter((w) => w === selectedPlayers[1]).length,
+                [selectedPlayers[0]]: Object.values(newWinners).filter((w) => w === selectedPlayers[0]).length,
+                [selectedPlayers[1]]: Object.values(newWinners).filter((w) => w === selectedPlayers[1]).length,
             };
 
             if (winnerCounts[winner] === 2) {
@@ -122,9 +130,42 @@ const Scoreboard: React.FC = () => {
         setGameScores({}); // Reset game scores when players are selected
         setCurrentGame(1); // Reset to the first game
         setServingPlayer(null); // Reset serving player
-        setGameWinners([]); // Reset game winners
+        setGameWinners({}); // Reset game winners
         setMatchWinner(null); // Reset match winner
     };
+
+    const handleStartMatch = async () => {
+        try {
+            const response = await axios.post('http://localhost:3001/api/tournaments/:tournament_id/matches', {
+                tournament_id: selectedTournament,
+                player1: selectedPlayers[0],
+                player2: selectedPlayers[1],
+            });
+            setCurrentMatchId(response.data.match_id);
+        } catch (error) {
+            console.error('Error starting match:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (currentMatchId !== null) {
+            const fetchScores = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:3001/api/tournaments/:tournament_id/matches/${currentMatchId}/scores`);
+                    const scores = response.data.reduce((acc: any, score: Score) => {
+                        if (!acc[score.game_number]) acc[score.game_number] = {};
+                        acc[score.game_number][score.player_bsa_bwf_number] = score.score;
+                        return acc;
+                    }, {});
+                    setGameScores(scores);
+                } catch (error) {
+                    console.error('Error fetching scores:', error);
+                }
+            };
+
+            fetchScores();
+        }
+    }, [currentMatchId]);
 
     return (
         <div>
@@ -177,6 +218,7 @@ const Scoreboard: React.FC = () => {
                             ))}
                         </select>
                     </div>
+                    <button onClick={handleStartMatch}>Start Match</button>
                 </div>
             )}
 
@@ -189,15 +231,15 @@ const Scoreboard: React.FC = () => {
                                 <div key={player}>
                                     <p>
                                         {players.find((p) => p.bsa_bwf_number === player)?.name} {players.find((p) => p.bsa_bwf_number === player)?.surname} {servingPlayer === player ? '*' : ''}
-                                        <button onClick={() => handleScoreChange(player, true)} disabled={game !== currentGame || gameWinners.includes(player)}>+</button>
+                                        <button onClick={() => handleScoreChange(player, true)} disabled={game !== currentGame || !!gameWinners[game]}>+</button>
                                         <span>{(gameScores[game]?.[player] ?? 0).toString()}</span>
-                                        <button onClick={() => handleScoreChange(player, false)} disabled={game !== currentGame || gameWinners.includes(player)}>-</button>
+                                        <button onClick={() => handleScoreChange(player, false)} disabled={game !== currentGame || !!gameWinners[game]}>-</button>
                                     </p>
                                 </div>
                             ))}
-                            {gameWinners[game - 1] && (
+                            {gameWinners[game] && (
                                 <div>
-                                    <h3>Game {game} Winner: {players.find((p) => p.bsa_bwf_number === gameWinners[game - 1])?.name}</h3>
+                                    <h3>Game {game} Winner: {players.find((p) => p.bsa_bwf_number === gameWinners[game])?.name}</h3>
                                 </div>
                             )}
                         </div>

@@ -98,4 +98,64 @@ router.get('/tournaments/:tournament_id/players', async (req, res) => {
   }
 });
 
+// Score routes
+router.get('/tournaments/:tournament_id/matches/:match_id/scores', async (req, res) => {
+  const db = await dbPromise;
+  const { match_id } = req.params;
+  try {
+    const scores = await db.all(
+        `SELECT * FROM scores WHERE match_id = ?`,
+        [match_id]
+    );
+    res.json(scores);
+  } catch (error) {
+    console.error('Error fetching scores:', error);
+    res.status(500).send('Error fetching scores');
+  }
+});
+
+router.post('/tournaments/:tournament_id/matches/:match_id/scores', async (req, res) => {
+  const db = await dbPromise;
+  const { match_id } = req.params;
+  const { game_number, player_bsa_bwf_number, score } = req.body;
+  try {
+    await db.run(
+        'INSERT INTO scores (match_id, game_number, player_bsa_bwf_number, score) VALUES (?, ?, ?, ?)',
+        [match_id, game_number, player_bsa_bwf_number, score]
+    );
+    res.status(201).send();
+  } catch (error) {
+    console.error('Error inserting score:', error);
+    res.status(500).send('Error inserting score');
+  }
+});
+
+router.put('/tournaments/:tournament_id/matches/:match_id/scores/:game_number/:player_bsa_bwf_number', async (req, res) => {
+  const db = await dbPromise;
+  const { match_id, game_number, player_bsa_bwf_number } = req.params;
+  const { score } = req.body;
+  try {
+    await db.run(
+        'UPDATE scores SET score = ? WHERE match_id = ? AND game_number = ? AND player_bsa_bwf_number = ?',
+        [score, match_id, game_number, player_bsa_bwf_number]
+    );
+    res.status(200).send();
+  } catch (error) {
+    console.error('Error updating score:', error);
+    res.status(500).send('Error updating score');
+  }
+});
+
+router.delete('/tournaments/:tournament_id/matches/:match_id/scores', async (req, res) => {
+  const db = await dbPromise;
+  const { match_id } = req.params;
+  try {
+    await db.run('DELETE FROM scores WHERE match_id = ?', [match_id]);
+    res.status(200).send();
+  } catch (error) {
+    console.error('Error deleting scores:', error);
+    res.status(500).send('Error deleting scores');
+  }
+});
+
 export default router;
