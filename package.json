@@ -1,32 +1,34 @@
 {
-  "name": "your-app-name",
+  "name": "badminton-tournament-software",
   "version": "1.0.0",
   "description": "Your app description",
-  "main": "main.js",
+  "main": "electron.js",
   "scripts": {
     "start": "electron .",
-    "build": "pnpm run build:backend && pnpm run build:frontend && electron-builder",
+    "build": "pnpm run build:backend && pnpm run build:frontend && electron-builder --win",
     "build:backend": "cd packages/backend && pnpm install && pnpm run build && cd ../..",
-    "build:frontend": "cd packages/frontend && pnpm install && pnpm run build && cd ../.. && pnpm run copy:frontend",
-    "copy:frontend": "rm -rf dist && mkdir dist && cp -r packages/frontend/dist/* dist/"
+    "build:frontend": "cd packages/frontend && pnpm install && pnpm run build && cd ../.."
   },
   "build": {
     "productName": "Badminton Tournament Software",
     "files": [
-      "dist/**/*",
       "packages/backend/dist/**/*",
-      "main.js",
-      "preload.js"
+      "packages/frontend/dist/**/*",
+      "electron.js",
+      "installer/node-v20.14.0-x64.msi"
     ],
     "directories": {
       "buildResources": "build"
     },
     "win": {
-      "target": "nsis"
+      "target": [
+        "nsis"
+      ]
     }
   },
   "devDependencies": {
     "electron": "^30.0.8",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "^24.13.3",
+    "pkg": "^5.8.1"
   }
 }

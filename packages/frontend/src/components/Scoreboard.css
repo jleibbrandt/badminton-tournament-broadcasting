@@ -1,105 +1,110 @@
 @keyframes backgroundAnimation {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .display-container {
-    font-family: Arial, sans-serif;
-    padding: 10px;
+  font-family: Arial, sans-serif;
+  padding: 10px;
 }
 
 .display-scoreboard {
-    background: linear-gradient(270deg, red, gold, blue);
-    background-size: 600% 600%;
-    padding: 3px; /* Reduced padding */
-    border-radius: 5px;
-    max-width: 400px; /* Adjusted max-width to make it more compact */
-    margin: 0 auto;
-    animation: backgroundAnimation 10s ease infinite; /* Add animation */
+  background: linear-gradient(270deg, red, gold, blue);
+  background-size: 600% 600%;
+  padding: 3px; /* Reduced padding */
+  border-radius: 5px;
+  max-width: 400px; /* Adjusted max-width to make it more compact */
+  margin: 0 auto;
+  animation: backgroundAnimation 10s ease infinite; /* Add animation */
 }
 
 .player-info {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 5px 0; /* Reduced margin */
-    padding: 2px; /* Reduced padding */
-    background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent white background */
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    flex-direction: row;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 5px 0; /* Reduced margin */
+  padding: 2px; /* Reduced padding */
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.8
+  ); /* Slightly transparent white background */
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  flex-direction: row;
 }
 
 .flag {
-    margin-right: 15px; /* Adjust the margin to set the spacing between the flag and the name */
-    width: 32px; /* Set fixed width */
-    height: 32px; /* Set fixed height */
+  margin-right: 15px; /* Adjust the margin to set the spacing between the flag and the name */
+  width: 32px; /* Set fixed width */
+  height: 32px; /* Set fixed height */
 }
 
 .name {
-    flex-grow: 1;
-    font-size: 1em; /* Adjusted font size */
-    font-weight: bold;
+  flex-grow: 1;
+  font-size: 1em; /* Adjusted font size */
+  font-weight: bold;
 }
 
 .score-container {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end; /* Align scores to the right */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Align scores to the right */
 }
 
 .score {
-    font-size: 1.8em; /* Reduced font size to make it more compact */
-    margin: 0 3px; /* Reduced margin */
-    border: 1px solid #ccc; /* Added border to each score */
-    padding: 5px; /* Added padding to make the frame */
-    border-radius: 3px; /* Rounded corners for the frame */
-    background-color: #fff; /* Background color for the score frame */
-    width: 40px; /* Set fixed width */
-    height: 40px; /* Set fixed height */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+  font-size: 1.8em; /* Reduced font size to make it more compact */
+  margin: 0 3px; /* Reduced margin */
+  border: 1px solid #ccc; /* Added border to each score */
+  padding: 5px; /* Added padding to make the frame */
+  border-radius: 3px; /* Rounded corners for the frame */
+  background-color: #fff; /* Background color for the score frame */
+  width: 40px; /* Set fixed width */
+  height: 40px; /* Set fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }
 
 .controls {
-    display: flex;
-    flex-direction: column; /* Stack buttons vertically */
-    margin-left: 5px; /* Space between score and buttons */
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  margin-left: 5px; /* Space between score and buttons */
 }
 
 .controls button {
-    margin: 2px 0; /* Add some margin between buttons */
-    padding: 5px 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    background-color: #f0f0f0;
-    cursor: pointer;
+  margin: 2px 0; /* Add some margin between buttons */
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: #f0f0f0;
+  cursor: pointer;
 }
 
 .controls button:hover {
-    background-color: #e0e0e0;
+  background-color: #e0e0e0;
 }
 
 @media (max-width: 600px) {
-    .display-scoreboard {
-        max-width: 100%;
-    }
+  .display-scoreboard {
+    max-width: 100%;
+  }
 
-    .player-info {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  .player-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    .score-container {
-        margin-top: 5px;
-    }
+  .score-container {
+    margin-top: 5px;
+  }
 }

@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",  // Ensure module resolution is set to "node"
+    "moduleResolution": "node", // Ensure module resolution is set to "node"
     "baseUrl": "./",
     "paths": {
       "*": ["node_modules/*"]

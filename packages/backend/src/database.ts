@@ -1,9 +1,9 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from "sqlite3";
+import { open } from "sqlite";
+import fs from "fs";
+import path from "path";
 
-const dbPath = path.resolve(__dirname, '../database/tournament.db');
+const dbPath = path.resolve(__dirname, "../database/tournament.db");
 
 // Ensure the directory exists
 const dirPath = path.dirname(dbPath);
@@ -14,7 +14,7 @@ if (!fs.existsSync(dirPath)) {
 export async function initializeDatabase() {
   const db = await open({
     filename: dbPath,
-    driver: sqlite3.Database
+    driver: sqlite3.Database,
   });
 
   await db.exec(`
